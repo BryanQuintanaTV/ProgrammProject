@@ -9,10 +9,17 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -30,11 +37,51 @@ import org.bson.Document;
  */
 public class Menu extends javax.swing.JFrame {
 
+    Lista lista = new Lista();
+    MyStack stackR = new MyStack();
+    int placeMinusOne = 0;
+    int stackRecom = 4;
+    int stop = 1;
+    int temp;
+
     /**
      * Creates new form Menu
      */
     public Menu() {
 
+        MongoClient client = MongoClients.create("mongodb+srv://BryanDB:DTrUZ0em3XONr3fR@quintanabryan-g.dobuj.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoDatabase db = client.getDatabase("Music");
+
+        MongoCollection<Document> toys = db.getCollection("MusicInfo");
+
+        Document doc = toys.find().first();
+
+        try (MongoCursor<Document> cur = toys.find().iterator()) {
+
+            while (cur.hasNext()) {
+
+                doc = cur.next();
+                var users = new ArrayList<>(doc.values());
+                //lista.agregar(title, album, artist, platform, ERROR, previewLink, artistLink, trackLink, albumLink, pictureLink);
+                String title = (String) users.get(4);
+                String album = (String) users.get(7);
+                String artist = (String) users.get(5);
+                String platform = (String) users.get(1);
+                String duration = (String) users.get(10);
+                String preview = (String) users.get(12);
+                String artistLink = (String) users.get(6);
+                String trackLink = (String) users.get(11);
+                String albumLink = (String) users.get(8);
+                String pictureLink = (String) users.get(13);
+
+                lista.agregar(title, album, artist, platform, duration, preview, artistLink, trackLink, albumLink, pictureLink);
+                users.clear();
+
+            }
+            //System.out.println(""+lista.get(4, 1));
+            //lista.imprimir();
+        }
         initComponents();
     }
 
@@ -48,28 +95,29 @@ public class Menu extends javax.swing.JFrame {
     private void initComponents() {
 
         jDialogInfo = new javax.swing.JDialog();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
+        jLabelImage = new javax.swing.JLabel();
+        jLabelDuration = new javax.swing.JLabel();
+        jBtnPreview = new javax.swing.JButton();
+        jBtnArtist = new javax.swing.JButton();
+        jBtnTrack = new javax.swing.JButton();
+        jBtnAlbum = new javax.swing.JButton();
+        btnClose = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
+        jLabel20 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
-        jLabel16 = new javax.swing.JLabel();
-        jLabel17 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        jLabelPlatform = new javax.swing.JLabel();
+        jLabelArtist = new javax.swing.JLabel();
+        jLabelAlbum = new javax.swing.JLabel();
+        jLabelTitle = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         iniBtn = new javax.swing.JButton();
+        jLabelLoad = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -77,86 +125,123 @@ public class Menu extends javax.swing.JFrame {
         jDialogInfo.setMaximumSize(new java.awt.Dimension(963, 599));
         jDialogInfo.setMinimumSize(new java.awt.Dimension(963, 599));
         jDialogInfo.setModal(true);
+        jDialogInfo.setPreferredSize(new java.awt.Dimension(963, 599));
         jDialogInfo.getContentPane().setLayout(null);
 
-        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/unknown.jpg"))); // NOI18N
-        jDialogInfo.getContentPane().add(jLabel7);
-        jLabel7.setBounds(40, 50, 300, 300);
+        jLabelImage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/unknown.jpg"))); // NOI18N
+        jDialogInfo.getContentPane().add(jLabelImage);
+        jLabelImage.setBounds(40, 50, 300, 300);
 
-        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel8.setText("jLabel8");
-        jDialogInfo.getContentPane().add(jLabel8);
-        jLabel8.setBounds(420, 70, 37, 16);
+        jLabelDuration.setFont(new java.awt.Font("Franklin Gothic Medium Cond", 0, 30)); // NOI18N
+        jLabelDuration.setForeground(new java.awt.Color(255, 255, 255));
+        jLabelDuration.setText("..........");
+        jDialogInfo.getContentPane().add(jLabelDuration);
+        jLabelDuration.setBounds(490, 290, 460, 50);
 
+        jBtnPreview.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/Preview.png"))); // NOI18N
+        jBtnPreview.setBorder(null);
+        jBtnPreview.setContentAreaFilled(false);
+        jBtnPreview.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnPreviewActionPerformed(evt);
+            }
+        });
+        jDialogInfo.getContentPane().add(jBtnPreview);
+        jBtnPreview.setBounds(50, 470, 150, 60);
+
+        jBtnArtist.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/Artist.png"))); // NOI18N
+        jBtnArtist.setContentAreaFilled(false);
+        jBtnArtist.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnArtistActionPerformed(evt);
+            }
+        });
+        jDialogInfo.getContentPane().add(jBtnArtist);
+        jBtnArtist.setBounds(240, 470, 130, 50);
+
+        jBtnTrack.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/Track.png"))); // NOI18N
+        jBtnTrack.setContentAreaFilled(false);
+        jBtnTrack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnTrackActionPerformed(evt);
+            }
+        });
+        jDialogInfo.getContentPane().add(jBtnTrack);
+        jBtnTrack.setBounds(410, 470, 130, 50);
+
+        jBtnAlbum.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/Album.png"))); // NOI18N
+        jBtnAlbum.setContentAreaFilled(false);
+        jBtnAlbum.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnAlbumActionPerformed(evt);
+            }
+        });
+        jDialogInfo.getContentPane().add(jBtnAlbum);
+        jBtnAlbum.setBounds(570, 470, 130, 50);
+
+        btnClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/close.png"))); // NOI18N
+        btnClose.setContentAreaFilled(false);
+        btnClose.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCloseActionPerformed(evt);
+            }
+        });
+        jDialogInfo.getContentPane().add(btnClose);
+        btnClose.setBounds(800, 470, 120, 50);
+
+        jLabel9.setFont(new java.awt.Font("Franklin Gothic Medium Cond", 0, 30)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel9.setText("jLabel9");
+        jLabel9.setText("Artist:");
         jDialogInfo.getContentPane().add(jLabel9);
-        jLabel9.setBounds(410, 130, 37, 16);
+        jLabel9.setBounds(380, 190, 90, 50);
 
-        jLabel10.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel10.setText("jLabel10");
-        jDialogInfo.getContentPane().add(jLabel10);
-        jLabel10.setBounds(420, 200, 43, 16);
-
+        jLabel11.setFont(new java.awt.Font("Franklin Gothic Medium Cond", 0, 30)); // NOI18N
         jLabel11.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel11.setText("jLabel11");
+        jLabel11.setText("Duration:");
         jDialogInfo.getContentPane().add(jLabel11);
-        jLabel11.setBounds(400, 270, 43, 16);
+        jLabel11.setBounds(380, 290, 110, 50);
 
+        jLabel20.setFont(new java.awt.Font("Franklin Gothic Medium Cond", 0, 30)); // NOI18N
+        jLabel20.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel20.setText("Platform:");
+        jDialogInfo.getContentPane().add(jLabel20);
+        jLabel20.setBounds(380, 240, 110, 50);
+
+        jLabel10.setFont(new java.awt.Font("Franklin Gothic Medium Cond", 0, 30)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel10.setText("Album:");
+        jDialogInfo.getContentPane().add(jLabel10);
+        jLabel10.setBounds(380, 130, 90, 50);
+
+        jLabel12.setFont(new java.awt.Font("Franklin Gothic Medium Cond", 0, 30)); // NOI18N
         jLabel12.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel12.setText("jLabel12");
+        jLabel12.setText("Title:");
         jDialogInfo.getContentPane().add(jLabel12);
-        jLabel12.setBounds(400, 330, 43, 16);
+        jLabel12.setBounds(380, 70, 90, 50);
 
-        jLabel13.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel13.setText("..........");
-        jDialogInfo.getContentPane().add(jLabel13);
-        jLabel13.setBounds(640, 80, 30, 16);
+        jLabelPlatform.setFont(new java.awt.Font("Franklin Gothic Medium Cond", 0, 30)); // NOI18N
+        jLabelPlatform.setForeground(new java.awt.Color(255, 255, 255));
+        jLabelPlatform.setText("..........");
+        jDialogInfo.getContentPane().add(jLabelPlatform);
+        jLabelPlatform.setBounds(490, 240, 460, 50);
 
-        jLabel14.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel14.setText("..........");
-        jDialogInfo.getContentPane().add(jLabel14);
-        jLabel14.setBounds(620, 140, 30, 16);
+        jLabelArtist.setFont(new java.awt.Font("Franklin Gothic Medium Cond", 0, 30)); // NOI18N
+        jLabelArtist.setForeground(new java.awt.Color(255, 255, 255));
+        jLabelArtist.setText("..........");
+        jDialogInfo.getContentPane().add(jLabelArtist);
+        jLabelArtist.setBounds(490, 190, 460, 50);
 
-        jLabel15.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel15.setText("..........");
-        jDialogInfo.getContentPane().add(jLabel15);
-        jLabel15.setBounds(660, 190, 30, 16);
+        jLabelAlbum.setFont(new java.awt.Font("Franklin Gothic Medium Cond", 0, 30)); // NOI18N
+        jLabelAlbum.setForeground(new java.awt.Color(255, 255, 255));
+        jLabelAlbum.setText("..........");
+        jDialogInfo.getContentPane().add(jLabelAlbum);
+        jLabelAlbum.setBounds(490, 130, 460, 50);
 
-        jLabel16.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel16.setText("..........");
-        jDialogInfo.getContentPane().add(jLabel16);
-        jLabel16.setBounds(620, 250, 30, 16);
-
-        jLabel17.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel17.setText("..........");
-        jDialogInfo.getContentPane().add(jLabel17);
-        jLabel17.setBounds(600, 310, 30, 16);
-
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/Preview.png"))); // NOI18N
-        jButton1.setBorder(null);
-        jButton1.setContentAreaFilled(false);
-        jDialogInfo.getContentPane().add(jButton1);
-        jButton1.setBounds(50, 470, 150, 60);
-
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/Artist.png"))); // NOI18N
-        jButton2.setContentAreaFilled(false);
-        jDialogInfo.getContentPane().add(jButton2);
-        jButton2.setBounds(240, 470, 130, 50);
-
-        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/Track.png"))); // NOI18N
-        jButton3.setContentAreaFilled(false);
-        jDialogInfo.getContentPane().add(jButton3);
-        jButton3.setBounds(410, 470, 130, 50);
-
-        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/Album.png"))); // NOI18N
-        jButton4.setContentAreaFilled(false);
-        jDialogInfo.getContentPane().add(jButton4);
-        jButton4.setBounds(570, 470, 130, 50);
-
-        jButton5.setText("jButton5");
-        jDialogInfo.getContentPane().add(jButton5);
-        jButton5.setBounds(820, 470, 75, 22);
+        jLabelTitle.setFont(new java.awt.Font("Franklin Gothic Medium Cond", 0, 30)); // NOI18N
+        jLabelTitle.setForeground(new java.awt.Color(255, 255, 255));
+        jLabelTitle.setText("..........");
+        jDialogInfo.getContentPane().add(jLabelTitle);
+        jLabelTitle.setBounds(490, 70, 460, 50);
 
         jLabel19.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/Rectangle 24.png"))); // NOI18N
         jDialogInfo.getContentPane().add(jLabel19);
@@ -180,7 +265,7 @@ public class Menu extends javax.swing.JFrame {
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/Frame (2).png"))); // NOI18N
         getContentPane().add(jLabel2);
-        jLabel2.setBounds(60, 160, 340, 320);
+        jLabel2.setBounds(60, 150, 340, 320);
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
@@ -200,6 +285,12 @@ public class Menu extends javax.swing.JFrame {
         getContentPane().add(iniBtn);
         iniBtn.setBounds(0, 500, 430, 70);
 
+        jLabelLoad.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        jLabelLoad.setForeground(new java.awt.Color(0, 0, 0));
+        jLabelLoad.setText("Loading...");
+        getContentPane().add(jLabelLoad);
+        jLabelLoad.setBounds(160, 460, 130, 30);
+
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/black bg.png"))); // NOI18N
         getContentPane().add(jLabel3);
         jLabel3.setBounds(0, 290, 430, 400);
@@ -216,31 +307,68 @@ public class Menu extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void iniBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_iniBtnActionPerformed
-        MongoClient client = MongoClients.create("mongodb+srv://BryanDB:DTrUZ0em3XONr3fR@quintanabryan-g.dobuj.mongodb.net/?retryWrites=true&w=majority");
 
-        MongoDatabase db = client.getDatabase("Music");
-
-        MongoCollection<Document> toys = db.getCollection("MusicInfo");
-
-        Document doc = toys.find().first();
-
-        try (MongoCursor<Document> cur = toys.find().iterator()) {
-
-            while (cur.hasNext()) {
-
-                doc = cur.next();
-                var users = new ArrayList<>(doc.values());
-
-                System.out.println("S" + users.get(1) + users.get(2));
-            }
-        }
         JFrame frame = new JFrame();
-
+        frame.setBackground(new Color(16, 20, 31));
+        frame.getContentPane().setBackground(new Color(16, 20, 31));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setBounds(100, 100, 1920, 1080);
         frame.getContentPane().setLayout(null);
 
+        JPanel panel = new JPanel();
+        panel.setBackground(new Color(16, 20, 31));
+        panel.setBounds(20, 10, 1870, 90);
+        panel.setLayout(null);
+
+        JButton recom = new JButton("Give me 5 random recommendations");
+        ActionListener oyenteRecom = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                stackR.vaciarLista();
+                for (int i = 0; i < 5; i++) {
+                    int b = (int) (Math.random() * (lista.tamaLista() - 1 + 1) + 1);
+                    stackR.agregar(b);
+                    stop = 0;
+                }
+                stackRecom = 4;
+                Reco();
+
+            }
+        };
+
+        recom.addActionListener(oyenteRecom);
+        recom.setBounds(1600, 20, 250, 30);
+
+        //recom.setForeground(Color.white);
+        panel.add(recom);
+
+        JLabel num = new JLabel("Number");
+        num.setBounds(35, 40, 1900, 80);
+        num.setForeground(Color.white);
+        panel.add(num);
+
+        JLabel song = new JLabel("Song name");
+        song.setBounds(300, 40, 1900, 80);
+        song.setForeground(Color.white);
+        panel.add(song);
+
+        JLabel art = new JLabel("Artist name");
+        art.setBounds(900, 40, 1900, 80);
+        art.setForeground(Color.white);
+        panel.add(art);
+
+        JLabel alb = new JLabel("Album name");
+        alb.setBounds(1450, 40, 1900, 80);
+        alb.setForeground(Color.white);
+        panel.add(alb);
+
+        JLabel dur = new JLabel("Duration");
+        dur.setBounds(1790, 40, 1900, 80);
+        dur.setForeground(Color.white);
+        panel.add(dur);
+
         JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setBackground(new Color(16, 20, 31));
         scrollPane.setBounds(10, 101, 1900, 900);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         //scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -248,14 +376,16 @@ public class Menu extends javax.swing.JFrame {
 
         JPanel borderlaoutpanel = new JPanel();
         scrollPane.setViewportView(borderlaoutpanel);
+        borderlaoutpanel.setBackground(new Color(16, 20, 31));
         borderlaoutpanel.setLayout(new BorderLayout(0, 0));
 
         JPanel columnpanel = new JPanel();
+        columnpanel.setBackground(new Color(16, 20, 31));
         borderlaoutpanel.add(columnpanel, BorderLayout.NORTH);
         columnpanel.setLayout(new GridLayout(0, 1, 0, 1));
         columnpanel.setBackground(Color.gray);
 
-        for (int i = 0; i < 32; i++) {
+        for (int i = 0; i < lista.tamaLista(); i++) {
             JPanel rowPanel = new JPanel();
             rowPanel.setPreferredSize(new Dimension(300, 30));
             columnpanel.add(rowPanel);
@@ -265,34 +395,74 @@ public class Menu extends javax.swing.JFrame {
 
             button.setBounds(20, 5, 89, 23);
             rowPanel.add(button);
-            
-            JLabel showTitle = new JLabel("Song's title");
-            showTitle.setBounds(125, 5, 89, 23);
+
+            JLabel showTitle = new JLabel(lista.get(4, i));
+            showTitle.setForeground(Color.white);
+            showTitle.setBounds(125, 5, 400, 23);
             rowPanel.add(showTitle);
-            
-            JLabel showArtist = new JLabel("Artist's title");
-            showArtist.setBounds(225, 5, 89, 23);
+
+            JLabel showArtist = new JLabel(lista.get(5, i));
+            showArtist.setForeground(Color.white);
+            showArtist.setBounds(650, 5, 400, 23);
             rowPanel.add(showArtist);
-            
-            JLabel showAlbum = new JLabel("Album's title");
-            showAlbum.setBounds(325, 5, 89, 23);
+
+            JLabel showAlbum = new JLabel(lista.get(7, i));
+            showAlbum.setForeground(Color.white);
+            showAlbum.setBounds(1255, 5, 400, 23);
             rowPanel.add(showAlbum);
-            
-            JLabel showDuration = new JLabel("Duration time");
-            showDuration.setBounds(425, 5, 89, 23);
-            rowPanel.add(showDuration);
-            
+
+            int time = Integer.parseInt(lista.get(10, i));
+            int sec = time % 60;
+            int min = (time / 60) % 60;
+
+            if (sec < 10) {
+                JLabel showDuration = new JLabel(min + ":0" + sec + " Min");
+                showDuration.setForeground(Color.white);
+                showDuration.setBounds(1790, 5, 390, 23);
+                rowPanel.add(showDuration);
+            } else {
+                JLabel showDuration = new JLabel(min + ":" + sec + " Min");
+                showDuration.setForeground(Color.white);
+                showDuration.setBounds(1790, 5, 390, 23);
+                rowPanel.add(showDuration);
+            }
 
             if (i % 2 == 0) {
-                rowPanel.setBackground(SystemColor.inactiveCaptionBorder);
+                rowPanel.setBackground(new Color(16, 20, 31));
+            } else {
+                rowPanel.setBackground(new Color(35, 44, 69));
             }
 
             ActionListener oyente = new ActionListener() {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-
+                    stackRecom = -5;
                     System.out.println(((JButton) e.getSource()).getText());
+                    int place = Integer.parseInt(((JButton) e.getSource()).getText());
+                    placeMinusOne = place - 1;
+                    jLabelTitle.setText(lista.get(4, placeMinusOne));
+                    jLabelAlbum.setText(lista.get(7, placeMinusOne));
+                    jLabelArtist.setText(lista.get(5, placeMinusOne));
+                    jLabelPlatform.setText(lista.get(1, placeMinusOne));
+
+                    Image image = null;/* w  ww .  ja  v  a 2 s.c o m*/
+                    try {
+                        URL url = new URL(lista.get(13, placeMinusOne));
+                        image = ImageIO.read(url);
+                    } catch (IOException en) {
+                    }
+                    jLabelImage.setIcon(new ImageIcon(image));
+                    int time = Integer.parseInt(lista.get(10, placeMinusOne));
+                    int sec = time % 60;
+                    int min = (time / 60) % 60;
+
+                    if (sec < 10) {
+                        jLabelDuration.setText(min + ":0" + sec + " Min");
+                    } else {
+                        jLabelDuration.setText(min + ":" + sec + " Min");
+                    }
+
                     jDialogInfo.setVisible(true);
                 }
             };
@@ -300,13 +470,140 @@ public class Menu extends javax.swing.JFrame {
             button.addActionListener(oyente);
 
         }
-
+        frame.add(panel);
         frame.add(scrollPane);
         this.setVisible(false);
         frame.setVisible(true);
 
 
     }//GEN-LAST:event_iniBtnActionPerformed
+
+    public void Reco() {
+
+        stackR.imprimir();
+
+        if (stackRecom >= 0) {
+            try {
+                temp = stackR.obtenValorEn(stackRecom);
+
+                jLabelTitle.setText(lista.get(4, temp));
+                jLabelAlbum.setText(lista.get(7, temp));
+                jLabelArtist.setText(lista.get(5, temp));
+                jLabelPlatform.setText(lista.get(1, temp));
+
+                Image image = null;/* w  ww .  ja  v  a 2 s.c o m*/
+                try {
+                    URL url = new URL(lista.get(13, temp));
+                    image = ImageIO.read(url);
+                } catch (IOException en) {
+                }
+                jLabelImage.setIcon(new ImageIcon(image));
+                int time = Integer.parseInt(lista.get(10, temp));
+                int sec = time % 60;
+                int min = (time / 60) % 60;
+
+                if (sec < 10) {
+                    jLabelDuration.setText(min + ":0" + sec + " Min");
+                } else {
+                    jLabelDuration.setText(min + ":" + sec + " Min");
+                }
+                stackRecom--;
+                jDialogInfo.setVisible(true);
+
+            } catch (Exception ex) {
+                Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+        jDialogInfo.setVisible(false);
+        if (stackRecom >= 0) {
+            //oyenteRecom.();
+            System.out.println("stac" + stackRecom);
+            System.out.println("temp" + temp);
+            Reco();
+        }
+    }//GEN-LAST:event_btnCloseActionPerformed
+
+    private void jBtnPreviewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnPreviewActionPerformed
+
+        if (stackRecom >= -1) {
+            try {
+                String url = lista.get(12, temp);
+                java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+            } catch (java.io.IOException e) {
+                System.out.println(e.getMessage());
+            }
+        } else {
+            try {
+                String url = lista.get(12, placeMinusOne);
+                java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+            } catch (java.io.IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+
+    }//GEN-LAST:event_jBtnPreviewActionPerformed
+
+    private void jBtnArtistActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnArtistActionPerformed
+        if (stackRecom >= -1) {
+            try {
+                String url = lista.get(6, temp);
+                java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+            } catch (java.io.IOException e) {
+                System.out.println(e.getMessage());
+            }
+        } else {
+            try {
+                String url = lista.get(6, placeMinusOne);
+                java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+            } catch (java.io.IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+
+    }//GEN-LAST:event_jBtnArtistActionPerformed
+
+    private void jBtnTrackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnTrackActionPerformed
+        if (stackRecom >= -1) {
+            try {
+                String url = lista.get(11, temp);
+                java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+            } catch (java.io.IOException e) {
+                System.out.println(e.getMessage());
+            }
+        } else {
+            try {
+                String url = lista.get(11, placeMinusOne);
+                java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+            } catch (java.io.IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+    }//GEN-LAST:event_jBtnTrackActionPerformed
+
+    private void jBtnAlbumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAlbumActionPerformed
+        if (stackRecom >= -1) {
+            try {
+                String url = lista.get(8, temp);
+                java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+            } catch (java.io.IOException e) {
+                System.out.println(e.getMessage());
+            }
+        } else {
+            try {
+                String url = lista.get(8, placeMinusOne);
+                java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+            } catch (java.io.IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+    }//GEN-LAST:event_jBtnAlbumActionPerformed
 
     /**
      * @param args the command line arguments
@@ -344,31 +641,32 @@ public class Menu extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnClose;
     private javax.swing.JButton iniBtn;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jBtnAlbum;
+    private javax.swing.JButton jBtnArtist;
+    private javax.swing.JButton jBtnPreview;
+    private javax.swing.JButton jBtnTrack;
     private javax.swing.JDialog jDialogInfo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel jLabelAlbum;
+    private javax.swing.JLabel jLabelArtist;
+    private javax.swing.JLabel jLabelDuration;
+    private javax.swing.JLabel jLabelImage;
+    private javax.swing.JLabel jLabelLoad;
+    private javax.swing.JLabel jLabelPlatform;
+    private javax.swing.JLabel jLabelTitle;
     // End of variables declaration//GEN-END:variables
 }
