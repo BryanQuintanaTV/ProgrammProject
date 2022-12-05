@@ -10,7 +10,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -27,10 +26,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import org.bson.Document;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 /**
  *
  * @author bryan
@@ -48,7 +43,7 @@ public class Menu extends javax.swing.JFrame {
      * Creates new form Menu
      */
     public Menu() {
-
+           //Connection to the database
         MongoClient client = MongoClients.create("mongodb+srv://BryanDB:DTrUZ0em3XONr3fR@quintanabryan-g.dobuj.mongodb.net/?retryWrites=true&w=majority");
 
         MongoDatabase db = client.getDatabase("Music");
@@ -520,8 +515,8 @@ public class Menu extends javax.swing.JFrame {
         jDialogInfo.setVisible(false);
         if (stackRecom >= 0) {
             //oyenteRecom.();
-            System.out.println("stac" + stackRecom);
-            System.out.println("temp" + temp);
+            //System.out.println("stac" + stackRecom);
+            //System.out.println("temp" + temp);
             Reco();
         }
     }//GEN-LAST:event_btnCloseActionPerformed
